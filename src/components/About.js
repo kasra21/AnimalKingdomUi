@@ -80,9 +80,9 @@ class About extends React.Component {
 
   //add the error or the result to the page
   processClassificationResult(response) {
+    this.setState({loading: false});
     if(response.msg === "success"){
 
-      this.setState({loading: false});
       this.setState({tableData: response.result});
       this.setState({table: <Table>
         <TableHeader>
