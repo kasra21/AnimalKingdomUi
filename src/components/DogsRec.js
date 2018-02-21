@@ -86,11 +86,16 @@ class DogsRec extends React.Component {
   processClassificationResult(response) {
     if(response.msg === "success"){
 
-      this.setState({tableData: response.result});
+      this.setState({tableData: response.result.map(x => {
+        var obj = {};
+        obj.type = this.setAnimalType(x.type);
+        obj.simularityPercentageStr = x.simularityPercentageStr;
+        return obj;
+      })});
 
       this.removeDuplicates();
 
-      if(this.state.tableData[0].simularityPercentage <= 4.99) {
+      if(this.state.tableData[0].simularityPercentage < 5.01) {
         toast.warn("We have difficulties to identify the image, please try another image ...", {
           position: toast.POSITION.BOTTOM_LEFT
         });
@@ -139,13 +144,20 @@ class DogsRec extends React.Component {
 
   removeDuplicates() {
     var uniqueTableData = [];
+    uniqueTableData.push(this.state.tableData[0]);
     this.state.tableData.forEach(element => {
       var key = element.type;
-      uniqueTableData.forEach(el => {
-        if(el.type !== key) {
+      var addFlag = true;
+        (function(){
+          uniqueTableData.forEach(el => {
+            if(el.type === key) {
+              addFlag = false;
+            }
+          });
+        })();
+        if(addFlag){
           uniqueTableData.push(element);
         }
-      });
     });
 
     this.setState({tableData: uniqueTableData});

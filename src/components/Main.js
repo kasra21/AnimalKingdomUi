@@ -1,5 +1,5 @@
 import React from 'react'
-import About from './About'
+import AnimalsRec from './AnimalsRec'
 import DogsRec from './DogsRec'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
@@ -10,7 +10,7 @@ class Main extends React.Component {
      <Router>
        <main>
          <Switch>
-           <Route exact path='/' component={About}/>
+           <Route exact path='/' component={AnimalsRec}/>
            <Route path='/animalKingDom/dogsRec' component={DogsRec}/>
          </Switch>
        </main>
