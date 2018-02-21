@@ -1,9 +1,9 @@
 import React from 'react'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import {
-  AppBar,
+  AppBar, 
   Divider,
-  Drawer,
+  Drawer, 
   MenuItem, 
   RaisedButton,
   Table,
@@ -20,7 +20,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './App.css'
 
-class About extends React.Component {
+class DogsRec extends React.Component {
 
   //---------------------------------------Initialization
 
@@ -42,7 +42,7 @@ class About extends React.Component {
 
   handleClick(event){
     //make the session expired right away
-    window.location.replace("/animalKingDom/about");
+    window.location.replace("/animalKingDom/dogsRec");
   }
 
   componentDidMount() {
@@ -65,7 +65,7 @@ class About extends React.Component {
     var formData = new FormData();
     formData.append("file", files[0]);
     this.setState({loading: true});
-    axios.post('http://localhost:8090/api/classifyImage', formData, {
+    axios.post('/api/classifyDogImage', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -90,7 +90,7 @@ class About extends React.Component {
 
       this.removeDuplicates();
 
-      if(this.state.tableData[0].simularityPercentage < 4.99) {
+      if(this.state.tableData[0].simularityPercentage <= 4.99) {
         toast.warn("We have difficulties to identify the image, please try another image ...", {
           position: toast.POSITION.BOTTOM_LEFT
         });
@@ -99,7 +99,7 @@ class About extends React.Component {
         this.setState({table:<Table>
           <TableHeader>
             <TableRow>
-              <TableHeaderColumn>Animal</TableHeaderColumn>
+              <TableHeaderColumn>Dog Breed</TableHeaderColumn>
               <TableHeaderColumn>Simularity</TableHeaderColumn>
             </TableRow>
           </TableHeader>
@@ -128,113 +128,27 @@ class About extends React.Component {
   }
 
   //---------------------------------------Helpers
-  removeDuplicates() {
-    debugger;
-    var uniqueTableData = [];
-
-    for(var element in this.state.tableData){
-      for(var el in uniqueTableData){
-        if(el.type !== element.type) {
-          uniqueTableData.push(element);
-        }
-      }
-    }
-
-
-    this.setState({tableData: uniqueTableData});
-  }
-
   setAnimalType(type) {
     if (type.startsWith("alligatororcrocodile")) {
       return "Alligator"
     }
-    else if (type.startsWith("ape") || type.startsWith("monkey")) {
-      return "Ape"
-    }
-    else if (type.startsWith("bird")) {
-      return "Bird"
-    }
-    else if (type.startsWith("bison")) {
-      return "Bison"
-    }
-    else if (type.startsWith("cat")) {
-      return "Cat"
-    }
-    else if (type.startsWith("chicken")) {
-      return "Chicken"
-    }
-    else if (type.startsWith("cow")) {
-      return "Cow"
-    }
-    else if (type.startsWith("deer")) {
-      return "Deer"
-    }
-    else if(type.startsWith("dog")) {
-      return "Dog";
-    }
-    else if(type.startsWith("dolphin")) {
-      return "Dolphin";
-    }
-    else if(type.startsWith("duck")) {
-      return "Duck";
-    }
-    else if(type.startsWith("eagle")) {
-      return "Eagle";
-    }
-    else if(type.startsWith("elephant")) {
-      return "Elephant";
-    }
-    else if(type.startsWith("fish")) {
-      return "Fish";
-    }
-    else if (type.startsWith("frog")) {
-      return "Frog"
-    }
-    else if(type.startsWith("hamster")) {
-      return "Hamster";
-    }
-    else if(type.startsWith("horse")) {
-      return "Horse";
-    }
-    else if(type.startsWith("lion")) {
-      return "Lion";
-    }
-    else if(type.startsWith("lobsterorcrab")) {
-      return "Crab";
-    }
-    else if(type.startsWith("owl")) {
-      return "Owl";
-    }
-    else if(type.startsWith("pig")) {
-      return "Pig";
-    }
-    else if(type.startsWith("pnada")) {
-      return "Pnada";
-    }
-    else if(type.startsWith("rabbit")) {
-      return "Rabbit";
-    }
-    else if(type.startsWith("shark")) {
-      return "Shark";
-    }
-    else if(type.startsWith("sheeporgoat")) {
-      return "Sheep/Goat";
-    }
-    else if(type.startsWith("snake")) {
-      return "Snake";
-    }
-    else if(type.startsWith("spider")) {
-      return "Spider";
-    }
-    else if(type.startsWith("turkey")) {
-      return "Turkey";
-    }
-    else if (type.startsWith("wolf")) {
-      return "Wolf"
-    }
     else {
       return type;
     }
+  }
+
+  removeDuplicates() {
+    var uniqueTableData = [];
+    this.state.tableData.forEach(element => {
+      var key = element.type;
+      uniqueTableData.forEach(el => {
+        if(el.type !== key) {
+          uniqueTableData.push(element);
+        }
+      });
+    });
+
+    this.setState({tableData: uniqueTableData});
   }
 
   //---------------------------------------Page Structure
@@ -244,7 +158,7 @@ class About extends React.Component {
     <MuiThemeProvider>
       <div>
         <div>
-          <AppBar title="Animal Recognition"
+          <AppBar title="Dog Breed Recognition"
           onLeftIconButtonClick={this.handleToggle} >
           </AppBar>
 
@@ -253,7 +167,7 @@ class About extends React.Component {
             width={200}
             open={this.state.open}
             onRequestChange={(open) => this.setState({open})}>
-            <MenuItem disabled={true} style={{backgroundColor: '#00bcd4', color: '#ffffff', fontWeight: 'bold'}}>Animal Kingdom</MenuItem>
+            <MenuItem disabled={true} style={{backgroundColor: '#00bcd4', color: '#ffffff', fontWeight: 'bold'}} >Animal Kingdom</MenuItem>
             <Divider />
             <Link to='/'><MenuItem onTouchTap={this.handleClose}>Animal Recognition</MenuItem></Link>
             <Link to='/animalKingDom/dogsRec'><MenuItem onTouchTap={this.handleClose}>Dog Recognition</MenuItem></Link>
@@ -288,4 +202,4 @@ const marginTopStyle = {
 
 //---------------------------------------export
 
-export default About
+export default DogsRec
