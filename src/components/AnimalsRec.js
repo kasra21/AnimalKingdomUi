@@ -209,8 +209,11 @@ class AnimalsRec extends React.Component {
     else if(type.startsWith("lion")) {
       return "Lion";
     }
-    else if(type.startsWith("lobsterorcrab")) {
+    else if(type.startsWith("lobsterorcrab") || type.startsWith("crab")) {
       return "Crab";
+    }
+    else if(type.startsWith("macropodidae")) {
+      return "Macropodidae/Kangaroo ";
     }
     else if(type.startsWith("owl")) {
       return "Owl";
@@ -235,6 +238,9 @@ class AnimalsRec extends React.Component {
     }
     else if(type.startsWith("spider")) {
       return "Spider";
+    }
+    else if(type.startsWith("tiger")) {
+      return "Tiger";
     }
     else if(type.startsWith("turkey")) {
       return "Turkey";
