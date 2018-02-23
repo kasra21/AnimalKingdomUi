@@ -71,7 +71,7 @@ class AnimalsRec extends React.Component {
     var formData = new FormData();
     formData.append("file", files[0]);
     this.setState({loading: true});
-    axios.post('http://localhost:8090/api/classifyImage', formData, {
+    axios.post('/api/classifyImage', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
