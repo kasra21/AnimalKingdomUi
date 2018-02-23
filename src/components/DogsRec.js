@@ -73,12 +73,14 @@ class DogsRec extends React.Component {
     .then(response => {
       this.processClassificationResult(response.data);
       this.setState({loading: false});
+      this.$fileChooserInputElement.prop("value", "");
     })
     .catch(error => {
       toast.error("An Unexpected error has occured", {
         position: toast.POSITION.BOTTOM_LEFT
       });
       this.setState({loading: false});
+      this.$fileChooserInputElement.prop("value", "");
     });
   }
 

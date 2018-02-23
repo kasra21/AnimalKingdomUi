@@ -2,8 +2,10 @@ import React from 'react'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import {
   AppBar,
+  Dialog,
   Divider,
   Drawer,
+  FlatButton,
   MenuItem, 
   RaisedButton,
   Table,
@@ -28,6 +30,7 @@ class AnimalsRec extends React.Component {
     super(props);
     this.state = {
       open: false,
+      openDialog: false,
       tableData: [],
       table: "",
       loading: false,
@@ -37,6 +40,8 @@ class AnimalsRec extends React.Component {
 
   handleToggle = () => this.setState({open: !this.state.open});
   handleClose = () => this.setState({open: false});
+  handleOpenDialog = () => this.setState({openDialog: true});
+  handleCloseDialog = () => this.setState({openDialog: false});
 
   //---------------------------------------User Interaction
 
@@ -62,25 +67,44 @@ class AnimalsRec extends React.Component {
   //---------------------------------------Services
 
   handleFileUpload(files) {
+
     var formData = new FormData();
     formData.append("file", files[0]);
     this.setState({loading: true});
-    axios.post('/api/classifyImage', formData, {
+    axios.post('http://localhost:8090/api/classifyImage', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
     })
     .then(response => {
       this.processClassificationResult(response.data);
+      if(response.data.result[0].type.startsWith("dog")) {
+        this.handleOpenDialog();
+      }
       this.setState({loading: false});
+      this.$fileChooserInputElement.prop("value", "");
     })
     .catch(error => {
       toast.error("An Unexpected error has occured", {
         position: toast.POSITION.BOTTOM_LEFT
       });
       this.setState({loading: false});
+      this.$fileChooserInputElement.prop("value", "");
     });
   }
+
+  handleFileUploadDog() {
+    debugger;
+    console.log("test");
+    this.handleCloseDialog();
+    // if(element !== undefined && element.files.length > 0) {
+
+    // }
+  }
+
+  handleFileUploadDog = () => {this.setState({openDialog: false})
+    //this.handleCloseDialog();
+  };
 
   //add the error or the result to the page
   processClassificationResult(response) {
@@ -221,8 +245,8 @@ class AnimalsRec extends React.Component {
     else if(type.startsWith("pig")) {
       return "Pig";
     }
-    else if(type.startsWith("pnada")) {
-      return "Pnada";
+    else if(type.startsWith("panda")) {
+      return "Panda";
     }
     else if(type.startsWith("rabbit")) {
       return "Rabbit";
@@ -256,6 +280,20 @@ class AnimalsRec extends React.Component {
   //---------------------------------------Page Structure
 
   render() {
+    const actions = [
+      <FlatButton
+        label="No"
+        primary={true}
+        onClick={this.handleCloseDialog}
+      />,
+      <FlatButton
+        label="Yes"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleFileUploadDog}
+      />,
+    ];
+
     return (
     <MuiThemeProvider>
       <div>
@@ -290,6 +328,15 @@ class AnimalsRec extends React.Component {
           </Center>
           <ToastContainer />
         </div>
+        <Dialog
+          title="Dog Breed Recognition?"
+          actions={actions}
+          modal={false}
+          open={this.state.openDialog}
+          onRequestClose={this.handleCloseDialog}
+        >
+          This Animal looks like a Dog, would you like to identify the breed of dog?
+        </Dialog>
       </div>
     </MuiThemeProvider>
    );
