@@ -14,6 +14,7 @@ import {
   TableRowColumn
 } from 'material-ui'
 import Center from 'react-center';
+import Progress from 'react-progressbar';
 import { ToastContainer, toast } from 'react-toastify';
 import { RingLoader } from 'react-spinners';
 import { Link } from 'react-router-dom';
@@ -114,7 +115,7 @@ class DogsRec extends React.Component {
             {this.state.tableData.map((row, index) => (
               <TableRow key={index}>
                 <TableRowColumn>{this.setAnimalType(row.type)}</TableRowColumn>
-                <TableRowColumn>{row.simularityPercentageStr}</TableRowColumn>
+                <TableRowColumn>{row.simularityPercentageStr} <Progress color={this.setProgressBarColor(parseInt(row.simularityPercentageStr))} completed={parseInt(row.simularityPercentageStr)}/></TableRowColumn>
               </TableRow>
               ))}
           </TableBody>
@@ -141,6 +142,21 @@ class DogsRec extends React.Component {
     }
     else {
       return type;
+    }
+  }
+
+  setProgressBarColor(percentageVal) {
+    if(percentageVal < 10) {
+      return "#FF0000"
+    }
+    else if(percentageVal < 34) {
+      return "#FFFF00"
+    }
+    else if(percentageVal < 100) {
+      return "#00FF00"
+    }
+    else {
+      return "#000000"
     }
   }
 

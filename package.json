@@ -9,6 +9,7 @@
     "react": "^16.2.0",
     "react-center": "^1.1.1",
     "react-dom": "^16.2.0",
+    "react-progressbar": "^15.4.1",
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.1.1",
     "react-spinners": "^0.2.6",

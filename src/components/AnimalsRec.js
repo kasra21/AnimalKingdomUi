@@ -16,6 +16,7 @@ import {
   TableRowColumn
 } from 'material-ui'
 import Center from 'react-center';
+import Progress from 'react-progressbar';
 import { ToastContainer, toast } from 'react-toastify';
 import { RingLoader } from 'react-spinners';
 import { Link } from 'react-router-dom';
@@ -31,10 +32,12 @@ class AnimalsRec extends React.Component {
     this.state = {
       open: false,
       openDialog: false,
+      openUploadToHelpDialog: false,
       tableData: [],
       table: "",
       loading: false,
-      spinner: ""
+      spinner: "",
+      file: null
     };
   }
 
@@ -42,21 +45,25 @@ class AnimalsRec extends React.Component {
   handleClose = () => this.setState({open: false});
   handleOpenDialog = () => this.setState({openDialog: true});
   handleCloseDialog = () => this.setState({openDialog: false});
+  handleOpenUploadToHelpDialog = () => this.setState({openUploadToHelpDialog: true});
+  handleCloseUploadToHelpDialog = () => this.setState({openUploadToHelpDialog: false});
 
   //---------------------------------------User Interaction
 
-  handleClick(event){
-    //make the session expired right away
-    window.location.replace("/animalKingDom/about");
-  }
+  // handleClick(event){
+  //   //make the session expired right away
+  //   window.location.replace("/animalKingDom/about");
+  // }
 
   componentDidMount() {
     var $ = require ('jquery');
     this.$fileChooserInputElement = $(this.fileChooserInputElement);
-    this.setState({spinner: <RingLoader
+    this.setState({spinner: <div style={{marginTop: '40px'}}> 
+      <RingLoader
         color={'#00bcd4'} 
         loading={true} 
       />
+      </div>
     });
   }
 
@@ -70,6 +77,7 @@ class AnimalsRec extends React.Component {
 
     var formData = new FormData();
     formData.append("file", files[0]);
+    this.setState({file: files[0]});
     this.setState({loading: true});
     axios.post('/api/classifyImage', formData, {
         headers: {
@@ -77,12 +85,29 @@ class AnimalsRec extends React.Component {
         }
     })
     .then(response => {
-      this.processClassificationResult(response.data);
-      if(response.data.result[0].type.startsWith("dog")) {
-        this.handleOpenDialog();
+      if(response.data.result[0].simularityPercentage < 5.01) {
+        toast.warn("We have difficulties to identify the image, please try another image ...", {
+          position: toast.POSITION.BOTTOM_LEFT
+        });
+      }
+      else {
+        this.processClassificationResult(response.data);
+        if(response.data.result[0].type.startsWith("dog") ) {
+          this.handleOpenDialog();
+        }
       }
       this.setState({loading: false});
       this.$fileChooserInputElement.prop("value", "");
+      if(! toast.isActive(this.toastId)){
+        this.toastId = toast(
+          <div>
+            Don't like the result? Help us to improve our system!
+            <RaisedButton onClick={this.handleOpenUploadToHelpDialog} label="Click Here" style={{marginLeft: 8}} /> 
+          </div>, {
+          position: toast.POSITION.BOTTOM_LEFT,
+          autoClose: 15000
+        });
+      }
     })
     .catch(error => {
       toast.error("An Unexpected error has occured", {
@@ -93,18 +118,37 @@ class AnimalsRec extends React.Component {
     });
   }
 
-  handleFileUploadDog() {
-    debugger;
-    console.log("test");
-    this.handleCloseDialog();
-    // if(element !== undefined && element.files.length > 0) {
-
-    // }
+  handleFileUploadDog= () => {
+    this.setState({openDialog: false})
+    var formData = new FormData();
+    formData.append("file", this.state.file);
+    this.setState({loading: true});
+    axios.post('/api/classifyDogImage', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+    })
+    .then(response => {
+      this.processClassificationResult(response.data);
+      this.setState({loading: false});
+      if(! toast.isActive(this.toastId)){
+        this.toastId = toast(
+          <div>
+            Don't like the result? Help us to improve our system!
+            <RaisedButton onClick={this.handleOpenUploadToHelpDialog} label="Click Here" style={{marginLeft: 8}} /> 
+          </div>, {
+          position: toast.POSITION.BOTTOM_LEFT,
+          autoClose: 15000
+        });
+      }
+    })
+    .catch(error => {
+      toast.error("An Unexpected error has occured", {
+        position: toast.POSITION.BOTTOM_LEFT
+      });
+      this.setState({loading: false});
+    });
   }
-
-  handleFileUploadDog = () => {this.setState({openDialog: false})
-    //this.handleCloseDialog();
-  };
 
   //add the error or the result to the page
   processClassificationResult(response) {
@@ -119,34 +163,27 @@ class AnimalsRec extends React.Component {
 
       this.removeDuplicates();
 
-      if(this.state.tableData[0].simularityPercentage < 5.01) {
-        toast.warn("We have difficulties to identify the image, please try another image ...", {
-          position: toast.POSITION.BOTTOM_LEFT
-        });
-      }
-      else {
-        this.setState({table:<Table>
-          <TableHeader>
-            <TableRow>
-              <TableHeaderColumn>Animal</TableHeaderColumn>
-              <TableHeaderColumn>Simularity</TableHeaderColumn>
+      this.setState({table:<Table>
+        <TableHeader>
+          <TableRow>
+            <TableHeaderColumn>Animal</TableHeaderColumn>
+            <TableHeaderColumn>Simularity</TableHeaderColumn>
+          </TableRow>
+       </TableHeader>
+        <TableBody>
+          {this.state.tableData.map((row, index) => (
+            <TableRow key={index}>
+              <TableRowColumn>{row.type}</TableRowColumn>
+              <TableRowColumn>{row.simularityPercentageStr} <Progress color={this.setProgressBarColor(parseInt(row.simularityPercentageStr))} completed={parseInt(row.simularityPercentageStr)}/></TableRowColumn>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {this.state.tableData.map((row, index) => (
-              <TableRow key={index}>
-                <TableRowColumn>{row.type}</TableRowColumn>
-                <TableRowColumn>{row.simularityPercentageStr}</TableRowColumn>
-              </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-        });
+            ))}
+        </TableBody>
+      </Table>
+      });
   
-        toast.success("Successfully Recongnized the image!", {
-          position: toast.POSITION.BOTTOM_LEFT
-        });
-      }
+      toast.success("Successfully Recongnized the image!", {
+        position: toast.POSITION.BOTTOM_LEFT
+      });
 
     } else {    //it is error
       toast.warn(response.msg, {
@@ -154,6 +191,10 @@ class AnimalsRec extends React.Component {
       });
     }
 
+  }
+
+  UploadToHelpService() {
+    console.log("Test");
   }
 
   //---------------------------------------Helpers
@@ -176,6 +217,21 @@ class AnimalsRec extends React.Component {
     });
 
     this.setState({tableData: uniqueTableData});
+  }
+
+  setProgressBarColor(percentageVal) {
+    if(percentageVal < 10) {
+      return "#FF0000"
+    }
+    else if(percentageVal < 34) {
+      return "#FFFF00"
+    }
+    else if(percentageVal < 100) {
+      return "#00FF00"
+    }
+    else {
+      return "#000000"
+    }
   }
 
   setAnimalType(type) {
@@ -294,6 +350,20 @@ class AnimalsRec extends React.Component {
       />,
     ];
 
+    const actionsUploadToHelp = [
+      <FlatButton
+        label="Close"
+        primary={true}
+        onClick={this.handleCloseUploadToHelpDialog}
+      />,
+      <FlatButton
+        label="Send"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.UploadToHelpService}
+      />,
+    ];
+
     return (
     <MuiThemeProvider>
       <div>
@@ -336,6 +406,16 @@ class AnimalsRec extends React.Component {
           onRequestClose={this.handleCloseDialog}
         >
           This Animal looks like a Dog, would you like to identify the breed of dog?
+        </Dialog>
+
+        <Dialog
+          title="Help us to improve our system!"
+          actions={actionsUploadToHelp}
+          modal={true}
+          open={this.state.openUploadToHelpDialog}
+          onRequestClose={this.handleCloseUploadToHelpDialog}
+        >
+          Help us to improve our system by sending you the image with the expected label
         </Dialog>
       </div>
     </MuiThemeProvider>
