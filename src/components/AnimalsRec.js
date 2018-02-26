@@ -8,6 +8,7 @@ import {
   FlatButton,
   MenuItem, 
   RaisedButton,
+  SelectField,
   Table,
   TableBody,
   TableHeader,
@@ -37,8 +38,27 @@ class AnimalsRec extends React.Component {
       table: "",
       loading: false,
       spinner: "",
-      file: null
+      file: null,
+      dropdownValue: null,
+      dropdownItems: []
     };
+
+    axios.post('/api/getLabels', {
+      labelGroup: 'All'
+    })
+    .then(response => {
+      var tempArr = [];
+      for (let i = 0; i < response.data.labels.length; i++ ) {
+        tempArr.push(<MenuItem value={response.data.labels[i]} key={response.data.labels[i]} primaryText={response.data.labels[i]} />);
+      }
+      this.setState({dropdownItems: tempArr});
+      this.setState({dropdownValue: response.data.labels[0]});
+    })
+    .catch(error => {
+      toast.error("Error: " + error, {
+        position: toast.POSITION.BOTTOM_LEFT
+      });
+    });
   }
 
   handleToggle = () => this.setState({open: !this.state.open});
@@ -47,13 +67,9 @@ class AnimalsRec extends React.Component {
   handleCloseDialog = () => this.setState({openDialog: false});
   handleOpenUploadToHelpDialog = () => this.setState({openUploadToHelpDialog: true});
   handleCloseUploadToHelpDialog = () => this.setState({openUploadToHelpDialog: false});
+  dropdownHandleChange = (event, index, value) => this.setState({dropdownValue: value});
 
   //---------------------------------------User Interaction
-
-  // handleClick(event){
-  //   //make the session expired right away
-  //   window.location.replace("/animalKingDom/about");
-  // }
 
   componentDidMount() {
     var $ = require ('jquery');
@@ -71,7 +87,37 @@ class AnimalsRec extends React.Component {
     //this.$fileChooserInputElement.somePlugin('destroy');
   }
 
+  handleCloseAndHelp = () => {
+    this.handleOpenUploadToHelpDialog();
+  }
+
   //---------------------------------------Services
+
+  handleHelpFileUpload = () => {
+    var label = this.state.dropdownValue;
+    var file = this.state.file;
+    var formData = new FormData();
+    formData.append("file", file);
+    formData.append("label", label);
+
+    axios.post('/api/uploadTmpImage', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+    })
+    .then(response => {
+      toast.success("Thank you for you submission!", {
+        position: toast.POSITION.BOTTOM_LEFT
+      });
+      this.setState({openUploadToHelpDialog: false});
+    })
+    .catch(error => {
+      toast.error("An Unexpected error has occured", {
+        position: toast.POSITION.BOTTOM_LEFT
+      });
+      this.setState({openUploadToHelpDialog: false});
+    });
+  }
 
   handleFileUpload(files) {
 
@@ -191,10 +237,6 @@ class AnimalsRec extends React.Component {
       });
     }
 
-  }
-
-  UploadToHelpService() {
-    console.log("Test");
   }
 
   //---------------------------------------Helpers
@@ -360,7 +402,7 @@ class AnimalsRec extends React.Component {
         label="Send"
         primary={true}
         keyboardFocused={true}
-        onClick={this.UploadToHelpService}
+        onClick={this.handleHelpFileUpload}
       />,
     ];
 
@@ -381,6 +423,7 @@ class AnimalsRec extends React.Component {
             <Divider />
             <Link to='/'><MenuItem onTouchTap={this.handleClose}>Animal Recognition</MenuItem></Link>
             <Link to='/animalKingDom/dogsRec'><MenuItem onTouchTap={this.handleClose}>Dog Recognition</MenuItem></Link>
+            <MenuItem onTouchTap={this.handleCloseAndHelp}>Help us!</MenuItem>
           </Drawer>
 
         </div>
@@ -415,7 +458,19 @@ class AnimalsRec extends React.Component {
           open={this.state.openUploadToHelpDialog}
           onRequestClose={this.handleCloseUploadToHelpDialog}
         >
-          Help us to improve our system by sending you the image with the expected label
+          <div>
+            Help us to improve our system by sending us the image with the expected label.
+          </div>
+          <Center>
+            <SelectField floatingLabelText="Label" maxHeight={300} value={this.state.dropdownValue} autoWidth={true} onChange={this.dropdownHandleChange}>
+              {this.state.dropdownItems}
+            </SelectField>
+          </Center>
+          <Center>
+            <div style={marginTopStyle}>
+              <input type="file" onChange={(e) => {this.setState({file: e.target.files[0]}) }} style={{marginLeft: '12px'}} />
+            </div>
+          </Center>
         </Dialog>
       </div>
     </MuiThemeProvider>
