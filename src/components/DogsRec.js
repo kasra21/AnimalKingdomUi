@@ -40,12 +40,6 @@ class DogsRec extends React.Component {
   handleClose = () => this.setState({open: false});
 
   //---------------------------------------User Interaction
-
-  handleClick(event){
-    //make the session expired right away
-    window.location.replace("/animalKingDom/dogsRec");
-  }
-
   componentDidMount() {
     var $ = require ('jquery');
     this.$fileChooserInputElement = $(this.fileChooserInputElement);
@@ -64,9 +58,10 @@ class DogsRec extends React.Component {
 
   handleFileUpload(files) {
     var formData = new FormData();
+    formData.append("animal", "Dog");
     formData.append("file", files[0]);
     this.setState({loading: true});
-    axios.post('/api/classifyDogImage', formData, {
+    axios.post('/api/classifyImage', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

@@ -122,6 +122,7 @@ class AnimalsRec extends React.Component {
   handleFileUpload(files) {
 
     var formData = new FormData();
+    formData.append("animal", "All");
     formData.append("file", files[0]);
     this.setState({file: files[0]});
     this.setState({loading: true});
@@ -167,9 +168,10 @@ class AnimalsRec extends React.Component {
   handleFileUploadDog= () => {
     this.setState({openDialog: false})
     var formData = new FormData();
+    formData.append("animal", "Dog");
     formData.append("file", this.state.file);
     this.setState({loading: true});
-    axios.post('/api/classifyDogImage', formData, {
+    axios.post('/api/classifyImage', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -277,98 +279,21 @@ class AnimalsRec extends React.Component {
   }
 
   setAnimalType(type) {
-    if (type.startsWith("alligatororcrocodile")) {
+    if (type.startsWith("Alligatororcrocodile")) {
       return "Alligator"
     }
-    else if (type.startsWith("ape") || type.startsWith("monkey")) {
+    else if (type.startsWith("Ape") || type.startsWith("Monkey")) {
       return "Ape"
     }
-    else if (type.startsWith("bird")) {
+    else if (type.startsWith("Bird") || type.startsWith("Eagle")
+      || type.startsWith("Owl")) {
       return "Bird"
     }
-    else if (type.startsWith("bison")) {
-      return "Bison"
-    }
-    else if (type.startsWith("cat")) {
-      return "Cat"
-    }
-    else if (type.startsWith("chicken")) {
-      return "Chicken"
-    }
-    else if (type.startsWith("cow")) {
-      return "Cow"
-    }
-    else if (type.startsWith("deer")) {
-      return "Deer"
-    }
-    else if(type.startsWith("dog")) {
-      return "Dog";
-    }
-    else if(type.startsWith("dolphin")) {
-      return "Dolphin";
-    }
-    else if(type.startsWith("duck")) {
-      return "Duck";
-    }
-    else if(type.startsWith("eagle")) {
-      return "Eagle";
-    }
-    else if(type.startsWith("elephant")) {
-      return "Elephant";
-    }
-    else if(type.startsWith("fish")) {
-      return "Fish";
-    }
-    else if (type.startsWith("frog")) {
-      return "Frog"
-    }
-    else if(type.startsWith("hamster")) {
-      return "Hamster";
-    }
-    else if(type.startsWith("horse")) {
-      return "Horse";
-    }
-    else if(type.startsWith("lion")) {
-      return "Lion";
-    }
-    else if(type.startsWith("lobsterorcrab") || type.startsWith("crab")) {
-      return "Crab";
-    }
-    else if(type.startsWith("macropodidae")) {
+    else if(type.startsWith("Macropodidae")) {
       return "Macropodidae/Kangaroo ";
     }
-    else if(type.startsWith("owl")) {
-      return "Owl";
-    }
-    else if(type.startsWith("pig")) {
-      return "Pig";
-    }
-    else if(type.startsWith("panda")) {
-      return "Panda";
-    }
-    else if(type.startsWith("rabbit")) {
-      return "Rabbit";
-    }
-    else if(type.startsWith("shark")) {
-      return "Shark";
-    }
-    else if(type.startsWith("sheeporgoat")) {
+    else if(type.startsWith("Sheeporgoat")) {
       return "Sheep/Goat";
-    }
-    else if(type.startsWith("snake")) {
-      return "Snake";
-    }
-    else if(type.startsWith("spider")) {
-      return "Spider";
-    }
-    else if(type.startsWith("tiger")) {
-      return "Tiger";
-    }
-    else if(type.startsWith("turkey")) {
-      return "Turkey";
-    }
-    else if (type.startsWith("wolf")) {
-      return "Wolf"
     }
     else {
       return type;

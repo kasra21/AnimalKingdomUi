@@ -19,7 +19,7 @@ class Header extends React.Component {
     return (
     <MuiThemeProvider>
       <div>
-        <AppBar title="Animal  Kingdom"
+        <AppBar title="Animal Kingdom"
         onLeftIconButtonTouchTap={this.handleToggle} >
         </AppBar>
 
