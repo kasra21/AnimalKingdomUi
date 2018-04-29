@@ -139,7 +139,7 @@ class AnimalsRec extends React.Component {
       }
       else {
         this.processClassificationResult(response.data);
-        if(response.data.result[0].type.startsWith("dog") ) {
+        if(response.data.result[0].type.startsWith("Dog") ) {
           this.handleOpenDialog();
         }
       }
