@@ -44,7 +44,7 @@ class AnimalsRec extends React.Component {
     };
 
     axios.post('/api/getLabels', {
-      labelGroup: 'All'
+      labelGroup: 'Animal'
     })
     .then(response => {
       var tempArr = [];
