@@ -6,7 +6,7 @@ This project is the UI for the animal kindom project, where the compiled source 
 
 * **Clone The project**: 
 
-	 git clone https://kasra21@bitbucket.org/kasra21/animalkingdomui.git
+	 git clone https://github.com/kasra21/AnimalKingdomUi.git
 
 * **Details**:
 
